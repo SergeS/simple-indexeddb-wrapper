@@ -3,7 +3,7 @@ machine:
     version: v6.1.0
 test:
   override:
-    - gulp check
+    - gulp
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
     - find . -type f -regex ".*/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
