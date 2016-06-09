@@ -1,0 +1,29 @@
+<html>
+    <head>
+        
+    </head>
+    <body>
+        
+        <script src="node_modules/cursor-async.js/cursor-async.js"></script>
+        <script src="simple-indexeddb-wrapper.js"></script>
+        
+        <script type="text/javascript">
+            var myDb = IndexedDbWrapper("db", 4 , {
+                "expenses": {
+                    "id" : { primary : true, autoIncrement : true },
+                    "value" : {},
+                    "date": { index : true}
+                }
+            });
+            
+            myDb.expenses.limit(2,3).reverse().each(function(item) {
+                console.log(item);
+                return new Promise(function(resolve) {
+                    setTimeout(resolve, 500);
+                })
+            }).then(function() {
+                console.log("HI");
+            })
+        </script>
+    </body>
+</html>

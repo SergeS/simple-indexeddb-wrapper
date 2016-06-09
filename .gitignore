@@ -1,0 +1,6 @@
+node_modules
+test-results
+
+simple-indexeddb-wrapper.bundle.js
+simple-indexeddb-wrapper.min.js
+simple-indexeddb-wrapper.bundle.min.js

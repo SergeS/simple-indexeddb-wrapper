@@ -1,0 +1,16 @@
+machine:
+  node:
+    version: v6.1.0
+test:
+  override:
+    - gulp check
+  post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find . -type f -regex ".*/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+deployment:
+  npm:
+    branch: master
+    commands:
+      # login using environment variables
+      - echo -e "$NPM_USER\n$NPM_PASSWORD\n$NPM_EMAIL" | npm login
+      - npm run 2npm
