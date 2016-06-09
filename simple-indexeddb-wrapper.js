@@ -74,81 +74,81 @@ function getIDBKeyRange( root ) {
 
   function IndexQueryBuilder( db, name, indexName ) {
     var options = {};
-    
-    if( indexName) {
-      ['gt', 'lt'].forEach(function addQueryBuilderMethod(methodName) {
-        function comparisionMethod(value, include) {
-          options[methodName] = value;
-          options[methodName + 'e'] = !!include;
+
+    if ( indexName ) {
+      [ 'gt', 'lt' ].forEach( function addQueryBuilderMethod( methodName ) {
+        function comparisionMethod( value, include ) {
+          options[ methodName ] = value;
+          options[ methodName + 'e' ] = !!include;
           delete options.eq;
           return this;
         }
-        
-        this[methodName] = comparisionMethod.bind(this);
 
-        this[methodName + 'e'] = function comparisionMethodE(value) {
-          return comparisionMethod.call(this, value, true);
-        }.bind(this);
-      }.bind(this));
+        this[ methodName ] = comparisionMethod.bind( this );
 
-      this.eq = function eqMethod(value) {
+        this[ methodName + 'e' ] = function comparisionMethodE( value ) {
+          return comparisionMethod.call( this, value, true );
+        }.bind( this );
+      }.bind( this ) );
+
+      this.eq = function eqMethod( value ) {
         options.eq = value;
         delete options.gt;
         delete options.lt;
         return this;
-      }.bind(this);
+      }.bind( this );
     } else {
-      this.limit = function limitMethod(start, end, startIncl, endIncl) {
+      this.limit = function limitMethod( start, end, startIncl, endIncl ) {
         options.gt = start;
         options.gte = startIncl;
         options.lt = end;
         options.lte = endIncl;
         return this;
-      }.bind(this);
+      }.bind( this );
     }
-    
+
     this.reverse = function reverseMethod() {
       options.reverse = !options.reverse;
       return this;
-    }.bind(this);
+    }.bind( this );
 
-    function startCursor( outCursor ) { 
+    function startCursor( outCursor ) {
       var keyRange;
-      
-      if(typeof options.eq !== "undefined") {
-        keyRange = IDBKeyRange.only(options.eq);
-      } else if(typeof options.gt !== "undefined") {
-        if(typeof options.lt !== "undefined") {
-          keyRange = IDBKeyRange.bound(options.gt, options.lt, !options.gte, !options.lte);
+
+      if ( typeof options.eq !== 'undefined' ) {
+        keyRange = IDBKeyRange.only( options.eq );
+      } else if ( typeof options.gt !== 'undefined' ) {
+        if ( typeof options.lt !== 'undefined' ) {
+          keyRange = IDBKeyRange.bound( options.gt, options.lt, !options.gte, !options.lte );
         } else {
-          keyRange = IDBKeyRange.lowerBound(options.gt, !options.gte);
+          keyRange = IDBKeyRange.lowerBound( options.gt, !options.gte );
         }
-      } else if(typeof options.lt !== "undefined") {
-        keyRange = IDBKeyRange.upperBound(options.lt, !options.lte);
+      } else if ( typeof options.lt !== 'undefined' ) {
+        keyRange = IDBKeyRange.upperBound( options.lt, !options.lte );
       }
-      
+
       db.then( function startCursorFunc( dbInstance ) {
         var request = dbInstance.transaction( name ).objectStore( name )
-        if(indexName) {
-          request = request.index(indexName);
+        if ( indexName ) {
+          request = request.index( indexName );
         }
-        
-        request = request.openCursor(keyRange, options.reverse ? "prev" : "next");
-        
+
+        request = request.openCursor( keyRange, options.reverse ? 'prev' : 'next' );
+
         request.onsuccess = function collectionCursorFunc( event ) {
           var cursor = event.target.result;
-          if (cursor) {
-            outCursor.push(cursor.value);
-            cursor.continue();
+          if ( cursor ) {
+            outCursor.push( cursor.value );
+            cursor[ 'continue' ]();
           } else {
             outCursor.end();
           }
         }
 
         request.onerror = outCursor.error;
-      });
+      } );
     }
-    
+
     getCursotInterface( this, startCursor );
   }
 
@@ -156,7 +156,7 @@ function getIDBKeyRange( root ) {
     function get( id ) {
       return db.then( function getFunc( dbInstance ) {
         return new promise( function getPromise( resolve, reject ) {
-          var request = db.transaction( name ).objectStore( name ).get( id );
+          var request = dbInstance.transaction( name ).objectStore( name ).get( id );
 
           request.onsuccess = function getFuncScucces( event ) {
             resolve( event.target.result );
@@ -166,17 +166,17 @@ function getIDBKeyRange( root ) {
         } );
       } )
     }
-    
-    function index(indexName) {
-      return new IndexQueryBuilder(db, name, indexName);
-    }
-    
-    function reverse() {
-      return new IndexQueryBuilder(db, name).reverse();
+
+    function index( indexName ) {
+      return new IndexQueryBuilder( db, name, indexName );
     }
 
-    function limit(start, end) {
-      return new IndexQueryBuilder(db, name).limit(start, end, true, true);
+    function reverse() {
+      return new IndexQueryBuilder( db, name ).reverse();
+    }
+
+    function limit( start, end ) {
+      return new IndexQueryBuilder( db, name ).limit( start, end, true, true );
     }
 
     function save( record ) {
@@ -187,7 +187,7 @@ function getIDBKeyRange( root ) {
           request.onsuccess = function saveFuncScucces( event ) {
             console.log( event.target.result );
             record.id = event.target.result;
-            resolve(record);
+            resolve( record );
           }
 
           request.onerror = reject;
@@ -195,22 +195,22 @@ function getIDBKeyRange( root ) {
       } )
     }
 
-    function startCursor( outCursor ) { 
+    function startCursor( outCursor ) {
       db.then( function startCursorFunc( dbInstance ) {
         var request = dbInstance.transaction( name ).objectStore( name ).openCursor();
-        
+
         request.onsuccess = function collectionCursorFunc( event ) {
           var cursor = event.target.result;
-          if (cursor) {
-            outCursor.push(cursor.value);
-            cursor.continue();
+          if ( cursor ) {
+            outCursor.push( cursor.value );
+            cursor[ 'continue' ]();
           } else {
             outCursor.end();
           }
         }
 
         request.onerror = outCursor.error;
-      });
+      } );
     }
 
     getCursotInterface( this, startCursor );
@@ -238,40 +238,42 @@ function getIDBKeyRange( root ) {
 
     for ( i in model ) {
       ( function registerCollection( collectionName, collectionModel ) {
-        var 
+        var
           obj,
           keyN,
           keyPath,
           indexes = [],
           autoIncrement = false;
-        
-        for(keyN in collectionModel) {
-          (function processModelItem(name, options) {
-            if(options.primary) {
-              keyPath = name;
-              if(options.autoIncrement) {
-                autoIncrement = true;
-              }
-              return ;
+
+        function processModelItem( keyName, options ) {
+          if ( options.primary ) {
+            keyPath = keyName;
+            if ( options.autoIncrement ) {
+              autoIncrement = true;
             }
-            
-            if(!options.index) {
-              return ;
-            }
-            
-            indexes.push({ name : name , options : { unique : !!options.unique}});
-          })(keyN, collectionModel[keyN]);
+            return;
+          }
+
+          if ( !options.index ) {
+            return;
+          }
+
+          indexes.push( { name: keyName, options: { unique: !!options.unique } } );
         }
-          
+
+        for ( keyN in collectionModel ) {
+          processModelItem( keyN, collectionModel[ keyN ] );
+        }
+
         obj = new Collection( db, collectionName );
-        
+
         collections.push( {
           obj: obj,
           model: model[ collectionName ],
           name: collectionName,
-          keyPath : keyPath,
-          indexes : indexes,
-          autoIncrement : autoIncrement
+          keyPath: keyPath,
+          indexes: indexes,
+          autoIncrement: autoIncrement
         } );
 
         Object.defineProperty( this, collectionName, {
@@ -287,31 +289,31 @@ function getIDBKeyRange( root ) {
       var dbRequest = indexedDB.open( name, version );
 
       dbRequest.onupgradeneeded = function connectionCheckSchema( event ) {
-        var 
+        var
           upgradeDb = event.target.result,
           upgradeTransaction = event.target.transaction;
 
         collections.forEach( function connectionCheckCollection( collection ) {
-          var 
+          var
             collectionObjectStore;
 
           try {
             collectionObjectStore = upgradeTransaction.objectStore( collection.name );
-          } catch(e) {
-            if(e.name !== "NotFoundError") {
-              throw e;  
+          } catch ( e ) {
+            if ( e.name !== 'NotFoundError' ) {
+              throw e;
             }
-            
-            collectionObjectStore = upgradeDb.createObjectStore( collection.name, { autoIncrement : collection.autoIncrement, keyPath : collection.keyPath } );
+
+            collectionObjectStore = upgradeDb.createObjectStore( collection.name, { autoIncrement: collection.autoIncrement, keyPath: collection.keyPath } );
           }
 
-          collection.indexes.forEach(function connectionCheckCollectionKey( index ) {
+          collection.indexes.forEach( function connectionCheckCollectionKey( index ) {
             try {
-              collectionObjectStore.createIndex(index.name, index.name, index.options);
-            } catch(e) {
-              if(e.name !== "ConstraintError") {
+              collectionObjectStore.createIndex( index.name, index.name, index.options );
+            } catch ( e ) {
+              if ( e.name !== 'ConstraintError' ) {
                 throw e;
-              } 
+              }
             }
           } );
         } );
