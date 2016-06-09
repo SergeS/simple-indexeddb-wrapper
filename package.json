@@ -1,6 +1,6 @@
 {
   "name": "simple-indexeddb-wrapper",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Library for asynchronous cursors with basic functionality",
   "main": "simple-indexeddb-wrapper",
   "author": {
