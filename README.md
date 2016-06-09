@@ -1,3 +1,3 @@
-# CursorAsync library
+# Simple IndexedDB wrapper
 
-CursorAsync provides basic cursor functionalty with asynchronous data processing 
+This library implements only basic functionality in minimalistic way. Any additional functionality to be implemented on top.
